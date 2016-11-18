@@ -1,36 +1,10 @@
 ﻿using AntMe.English;
-using AntMe.Player.PowerAnt;
-using System;
+using AntMe.Player.PowerAnt.Utility;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace AntMe.Player.PowerAnt
+namespace AntMe.Player.PowerAnt.TaskManaging
 {
-    public class Task
-    {
-    }
-
-    public class SugarTask : Task
-    {
-        public Sugar Sugar { get; private set; }
-
-        public SugarTask(Sugar sugar)
-        {
-            Sugar = sugar;
-        }
-    }
-
-    public class FruitTask : Task
-    {
-        public Fruit Fruit { get; private set; }
-
-        public FruitTask(Fruit fruit)
-        {
-            Fruit = fruit;
-        }
-    }
-
     internal class TaskManager
     {
         Logger log = new Logger();
@@ -56,6 +30,10 @@ namespace AntMe.Player.PowerAnt
         public List<Sugar> Sugars { get; private set; } = new List<Sugar>();
         public List<Fruit> Fruits { get; private set; } = new List<Fruit>();
 
+        /// <summary>
+        /// Register an ant as worker in the task manager        
+        /// </summary>
+        /// <param name="ant"></param>
         public void RegisterWorker(PowerAntClass ant)
         {
             if (!Worker.Contains(ant))
@@ -65,23 +43,27 @@ namespace AntMe.Player.PowerAnt
             }
         }
 
+        /// <summary>
+        /// Unregister a (e.g. dead) worker and make 
+        /// sure that his remaining work is enqueued
+        /// </summary>
+        /// <param name="ant"></param>
+        /// <param name="task"></param>
         public void UnregisterWorker(PowerAntClass ant, Task task = null)
         {
             if (Worker.Contains(ant))
             {
-                if (task != null)
-                {
-                    // if (task is SugarTask)
-                    collectorQ.Enqueue(task);
-                    //if (task is FruitTask)
-                    //   fruitQ.Enqueue(task);
-                }
-
+                if (task != null) { collectorQ.Enqueue(task); }
                 Worker.Remove(ant);
-                log.Debug($"Worker unregistered {ant.Id}");
+
+                log.Debug($"Worker unregistered {ant.Id}, job={task}");
             }
         }
 
+        /// <summary>
+        /// Tell the task manager, that sugar was found
+        /// </summary>
+        /// <param name="sugar"></param>
         public void ReportSugar(Sugar sugar)
         {
             int existingTickets = 0;
@@ -96,13 +78,14 @@ namespace AntMe.Player.PowerAnt
 
                 // we know the sugar, but there are no tasks anymore for it
                 // this could be related to killed ants on their way back home
+                // so we will create new ones.
             }
             else
             {
                 Sugars.Add(sugar);
             }
 
-            var taskCount = (sugar.Amount - (existingTickets * 10)) / 10; //todo: get max load dynamicly
+            var taskCount = (sugar.Amount - (existingTickets * 10)) / 10; // TODO: get max load more dynamicly
             for (int i = 0; i < taskCount; i++)
             {
                 collectorQ.Enqueue(new SugarTask(sugar));
@@ -111,6 +94,10 @@ namespace AntMe.Player.PowerAnt
             log.Debug($"New sugar reported, enqueued {taskCount} tasks.");
         }
 
+        /// <summary>
+        /// Tell the task manager, that a fruit was found
+        /// </summary>
+        /// <param name="fruit"></param>
         public void ReportFruit(Fruit fruit)
         {
             if (Fruits.Contains(fruit)) return;
@@ -125,6 +112,11 @@ namespace AntMe.Player.PowerAnt
             log.Debug($"New fruit reported, enqueued {taskCount} tasks.");
         }
 
+        /// <summary>
+        /// Get a task to do some work
+        /// </summary>
+        /// <param name="caste"></param>
+        /// <returns>null, if the queue is empty</returns>
         public Task GetTask(string caste)
         {
             if (caste == Consts.Collector && collectorQ.Any())

@@ -1,11 +1,10 @@
 ﻿using AntMe.English;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace AntMe.Player.PowerAnt
 {
+    /// <summary>
+    /// Contains all collector specific logic
+    /// </summary>
     public partial class PowerAntClass
     {
         void CollectorSpotsFruit(Fruit fruit)
