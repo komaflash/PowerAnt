@@ -2,15 +2,13 @@ using AntMe.English;
 
 namespace AntMe.Player.PowerAnt.TaskManaging
 {
-
-    public class SugarTask : Task
+    public class FoodTask : Task
     {
-        public Sugar Sugar { get; private set; }
+        public Food Target { get; private set; }
 
-        public SugarTask(Sugar sugar)
+        public FoodTask(Food food)
         {
-            Sugar = sugar;
+            Target = food;
         }
     }
-
 }

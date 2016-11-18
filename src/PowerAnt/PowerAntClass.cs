@@ -28,7 +28,7 @@ namespace AntMe.Player.PowerAnt
         RotationSpeedModifier = 0,
         SpeedModifier = 0,
         ViewRangeModifier = 2
-    )]    
+    )]
     public partial class PowerAntClass : BaseAnt
     {
         Anthill Anthill;
@@ -55,7 +55,7 @@ namespace AntMe.Player.PowerAnt
             {
                 TaskManager.Instance.RegisterWorker(this);
                 return Consts.Collector;
-            }           
+            }
 
             return Consts.Scout;
         }
@@ -83,10 +83,7 @@ namespace AntMe.Player.PowerAnt
                 task = TaskManager.Instance.GetTask(this.Caste);
                 if (task != null)
                 {
-                    if (task is FruitTask)
-                        GoTo(((FruitTask)task).Fruit);
-                    else if (task is SugarTask)
-                        GoTo(((SugarTask)task).Sugar);
+                    GoTo(((FoodTask)task).Target);
                 }
                 else
                 {
@@ -98,7 +95,7 @@ namespace AntMe.Player.PowerAnt
             {
                 TurnByDegrees(RandomNumber.Number(-40, 40));
                 GoForward(100);
-            }            
+            }
         }
 
         /// <summary>

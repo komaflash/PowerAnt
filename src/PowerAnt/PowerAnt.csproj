@@ -49,8 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TaskManaging\FruitTask.cs" />
-    <Compile Include="TaskManaging\SugarTask.cs" />
+    <Compile Include="TaskManaging\FoodTask.cs" />
     <Compile Include="TaskManaging\Task.cs" />
     <Compile Include="TaskManaging\TaskManager.cs" />
     <Compile Include="Utility\Logger.cs" />

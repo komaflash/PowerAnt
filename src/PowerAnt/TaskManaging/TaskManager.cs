@@ -70,7 +70,7 @@ namespace AntMe.Player.PowerAnt.TaskManaging
 
             if (Sugars.Contains(sugar))
             {
-                existingTickets = collectorQ.Count(x => x is SugarTask && ((SugarTask)x).Sugar == sugar);
+                existingTickets = collectorQ.Count(x => x is FoodTask && ((FoodTask)x).Target == sugar);
                 if (existingTickets > 0)
                 {
                     return;
@@ -88,7 +88,7 @@ namespace AntMe.Player.PowerAnt.TaskManaging
             var taskCount = (sugar.Amount - (existingTickets * 10)) / 10; // TODO: get max load more dynamicly
             for (int i = 0; i < taskCount; i++)
             {
-                collectorQ.Enqueue(new SugarTask(sugar));
+                collectorQ.Enqueue(new FoodTask(sugar));
             }
 
             log.Debug($"New sugar reported, enqueued {taskCount} tasks.");
@@ -106,7 +106,7 @@ namespace AntMe.Player.PowerAnt.TaskManaging
             var taskCount = 3;
             for (int i = 0; i < taskCount; i++)
             {
-                collectorQ.Enqueue(new FruitTask(fruit));
+                collectorQ.Enqueue(new FoodTask(fruit));
             }
 
             log.Debug($"New fruit reported, enqueued {taskCount} tasks.");
