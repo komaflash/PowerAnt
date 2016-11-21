@@ -24,9 +24,9 @@ namespace AntMe.Player.PowerAnt.TaskManaging
         #endregion
 
         private Queue<Task> collectorQ = new Queue<Task>();
-        private Queue<Task> hunterQ = new Queue<Task>();
 
         public List<PowerAntClass> Worker { get; private set; } = new List<PowerAntClass>();
+        public List<Insect> Insects { get; private set; } = new List<Insect>();
         public List<Sugar> Sugars { get; private set; } = new List<Sugar>();
         public List<Fruit> Fruits { get; private set; } = new List<Fruit>();
 
@@ -112,6 +112,16 @@ namespace AntMe.Player.PowerAnt.TaskManaging
             log.Debug($"New fruit reported, enqueued {taskCount} tasks.");
         }
 
+        public void ReportInsect(Insect insect)
+        {
+            if (Insects.Contains(insect) && insect.CurrentEnergy > 0) return;
+
+            if (insect.CurrentEnergy <= 0)
+                Insects.Remove(insect);
+            else
+                Insects.Add(insect);
+        }
+
         /// <summary>
         /// Get a task to do some work
         /// </summary>
@@ -123,9 +133,9 @@ namespace AntMe.Player.PowerAnt.TaskManaging
             {
                 return collectorQ.Dequeue();
             }
-            else if (caste == Consts.Hunter && hunterQ.Any())
+            else if (caste == Consts.Hunter && Insects.Any())
             {
-                return hunterQ.Dequeue();
+                return new InsectTask(Insects.First());
             }
 
             return null;

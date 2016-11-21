@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace AntMe.Player.PowerAnt
 {
     [Player(
-        ColonyName = "PowerAnt",
+        ColonyName = "PowerAnt2",
         FirstName = "komaflash@github")]
     [Caste(
         Name = Consts.Collector,
@@ -28,6 +28,16 @@ namespace AntMe.Player.PowerAnt
         RotationSpeedModifier = 0,
         SpeedModifier = 0,
         ViewRangeModifier = 2
+    )]
+    [Caste(
+        Name = Consts.Hunter,
+        AttackModifier = 2,
+        EnergyModifier = 1,
+        LoadModifier = -1,
+        RangeModifier = -1,
+        RotationSpeedModifier = -1,
+        SpeedModifier = 0,
+        ViewRangeModifier = 0
     )]
     public partial class PowerAntClass : BaseAnt
     {
@@ -51,13 +61,18 @@ namespace AntMe.Player.PowerAnt
         {
             id = Guid.NewGuid().ToString().Split('-')[0];
 
-            if (typeCount[Consts.Collector] <= 95)
+            if (typeCount[Consts.Collector] <= 70)
             {
                 TaskManager.Instance.RegisterWorker(this);
                 return Consts.Collector;
             }
 
-            return Consts.Scout;
+            if (typeCount[Consts.Scout] < 1)
+            {
+                return Consts.Scout;
+            }
+
+            return Consts.Hunter;
         }
 
         #endregion
@@ -96,6 +111,22 @@ namespace AntMe.Player.PowerAnt
                 TurnByDegrees(RandomNumber.Number(-40, 40));
                 GoForward(100);
             }
+            else if (Caste == Consts.Hunter)
+            {
+                var enemyTask = TaskManager.Instance.GetTask(Caste);
+                if (enemyTask != null)
+                {
+                    var t = ((InsectTask)enemyTask).Target;
+                    if (t.CurrentEnergy > 0)
+                    {
+                        GoTo(t);
+                        return;
+                    }
+                }
+
+                TurnByDegrees(RandomNumber.Number(-20, 20));
+                GoForward(20);
+            }
         }
 
         /// <summary>
@@ -105,6 +136,8 @@ namespace AntMe.Player.PowerAnt
         /// </summary>
         public override void GettingTired()
         {
+            if (Caste == Consts.Hunter)
+                GoTo(Anthill);
         }
 
         /// <summary>
@@ -259,6 +292,20 @@ namespace AntMe.Player.PowerAnt
         /// <param name="bug">spotted bug</param>
         public override void SpotsEnemy(Bug bug)
         {
+            TaskManager.Instance.ReportInsect(bug);
+            if (Caste != Consts.Hunter) return;
+
+            if (FriendlyAntsFromSameCasteInViewrange >= 5)
+            {
+                Attack(bug);
+                TaskManager.Instance.ReportInsect(bug);
+            }
+            else
+            {
+                var degree = Coordinate.GetDegreesBetween(this, bug) - 180;
+                TurnToDirection(degree);
+                GoForward(20);
+            }
         }
 
         /// <summary>

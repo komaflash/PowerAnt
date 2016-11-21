@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TaskManaging\FoodTask.cs" />
+    <Compile Include="TaskManaging\HunterTask.cs" />
     <Compile Include="TaskManaging\Task.cs" />
     <Compile Include="TaskManaging\TaskManager.cs" />
     <Compile Include="Utility\Logger.cs" />
